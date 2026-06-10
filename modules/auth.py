@@ -61,6 +61,7 @@ def login_empleado(correo, clave):
 
 def cambiar_clave(correo, clave_nueva):
     df = cargar_usuarios()
+    df = df.astype(str)
     df.loc[df["correo"] == correo, "clave_hash"] = hashear_clave(clave_nueva)
     df.loc[df["correo"] == correo, "cambiar_clave"] = "0"
     guardar_usuarios(df)
