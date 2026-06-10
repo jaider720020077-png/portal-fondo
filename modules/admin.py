@@ -87,11 +87,12 @@ def lista_usuarios():
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
+                    df = df.astype(str)
                     df.loc[df["correo"] == fila["correo"], "clave_hash"] = "temporal123"
                     df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = "1"
                     guardar_usuarios(df)
                     st.toast("Clave reseteada a: temporal123", icon="🔑")
-                    st.rerun()
+            st.rerun()
 
 
 def crear_usuario_individual():
