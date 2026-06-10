@@ -57,7 +57,12 @@ def seccion_usuarios():
 
 
 def lista_usuarios():
-    df = cargar_usuarios().astype(str).copy()
+    from modules.database import actualizar_celda
+    df = leer_hoja("usuarios")
+    if df.empty:
+        st.info("No hay empleados registrados todavía.")
+        return
+
     empleados = df[df["perfil"] == "empleado"].copy()
 
     if empleados.empty:
@@ -67,32 +72,26 @@ def lista_usuarios():
     st.markdown(f"**{len(empleados)} empleados registrados**")
 
     for _, fila in empleados.iterrows():
-        with st.expander(f"{'🟢' if fila['activo'] == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
+        with st.expander(f"{'🟢' if str(fila['activo']) == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.write(f"**Cédula:** {fila['cedula']}")
-                st.write(f"**Estado:** {'Activo' if fila['activo'] == '1' else 'Inactivo'}")
+                st.write(f"**Estado:** {'Activo' if str(fila['activo']) == '1' else 'Inactivo'}")
             with col2:
-                if fila["activo"] == "1":
+                if str(fila["activo"]) == "1":
                     if st.button("🔴 Desactivar", key=f"desact_{fila['correo']}"):
-                        df2 = cargar_usuarios().astype(str).copy()
-                        df2.loc[df2["correo"] == fila["correo"], "activo"] = "0"
-                        guardar_usuarios(df2)
+                        actualizar_celda("usuarios", "correo", fila["correo"], "activo", "0")
                         st.toast("Usuario desactivado.", icon="🔴")
                         st.rerun()
                 else:
                     if st.button("🟢 Activar", key=f"act_{fila['correo']}"):
-                        df2 = cargar_usuarios().astype(str).copy()
-                        df2.loc[df2["correo"] == fila["correo"], "activo"] = "1"
-                        guardar_usuarios(df2)
+                        actualizar_celda("usuarios", "correo", fila["correo"], "activo", "1")
                         st.toast("Usuario activado.", icon="🟢")
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
-                    df2 = cargar_usuarios().astype(str).copy()
-                    df2.loc[df2["correo"] == fila["correo"], "clave_hash"] = "temporal123"
-                    df2.loc[df2["correo"] == fila["correo"], "cambiar_clave"] = "1"
-                    guardar_usuarios(df2)
+                    actualizar_celda("usuarios", "correo", fila["correo"], "clave_hash", "temporal123")
+                    actualizar_celda("usuarios", "correo", fila["correo"], "cambiar_clave", "1")
                     st.toast("Clave reseteada a: temporal123", icon="🔑")
                     st.rerun()
 
