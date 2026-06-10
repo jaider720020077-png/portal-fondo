@@ -60,18 +60,18 @@ def lista_usuarios():
     from modules.database import actualizar_celda
     df = leer_hoja("usuarios")
     if df.empty:
-        st.info("No hay empleados registrados todavía.")
+        st.info("No hay asociados registrados todavía.")
         return
 
-    empleados = df[df["perfil"] == "empleado"].copy()
+    asociados = df[df["perfil"] == "asociado"].copy()
 
-    if empleados.empty:
-        st.info("No hay empleados registrados todavía.")
+    if asociados.empty:
+        st.info("No hay asociados registrados todavía.")
         return
 
-    st.markdown(f"**{len(empleados)} empleados registrados**")
+    st.markdown(f"**{len(asociados)} asociados registrados**")
 
-    for _, fila in empleados.iterrows():
+    for _, fila in asociados.iterrows():
         with st.expander(f"{'🟢' if str(fila['activo']) == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -97,7 +97,7 @@ def lista_usuarios():
 
 
 def crear_usuario_individual():
-    st.markdown("#### Crear empleado nuevo")
+    st.markdown("#### Crear asociado nuevo")
     with st.form("form_crear_usuario"):
         col1, col2 = st.columns(2)
         with col1:
@@ -108,7 +108,7 @@ def crear_usuario_individual():
             clave_temp = st.text_input(
                 "Clave temporal *",
                 value="temporal123",
-                help="El empleado deberá cambiarla en su primer ingreso"
+                help="El asociado deberá cambiarla en su primer ingreso"
             )
         crear = st.form_submit_button("Crear usuario", use_container_width=True)
 
@@ -128,7 +128,7 @@ def crear_usuario_individual():
             "nombre": nombre,
             "correo": correo,
             "clave_hash": clave_temp,
-            "perfil": "empleado",
+            "perfil": "asociado",
             "activo": "1",
             "cambiar_clave": "1"
         }
@@ -141,7 +141,7 @@ def carga_masiva_usuarios():
     st.markdown("#### Carga masiva desde Excel")
     st.info("El archivo debe tener estas columnas: **cedula, nombre, correo**")
 
-    archivo = st.file_uploader("Sube el Excel de empleados", type=["xlsx"])
+    archivo = st.file_uploader("Sube el Excel de asociados", type=["xlsx"])
 
     if archivo:
         try:
@@ -152,7 +152,7 @@ def carga_masiva_usuarios():
                 return
             df_nuevo = df_nuevo[columnas].dropna()
             st.dataframe(df_nuevo, use_container_width=True)
-            st.markdown(f"**{len(df_nuevo)} empleados encontrados**")
+            st.markdown(f"**{len(df_nuevo)} asociados encontrados**")
 
             if st.button("✅ Confirmar carga masiva", use_container_width=True):
                 df_actual = cargar_usuarios()
@@ -167,7 +167,7 @@ def carga_masiva_usuarios():
                         "nombre": fila["nombre"],
                         "correo": fila["correo"],
                         "clave_hash": "temporal123",
-                        "perfil": "empleado",
+                        "perfil": "asociado",
                         "activo": "1",
                         "cambiar_clave": "1"
                     }
@@ -177,14 +177,14 @@ def carga_masiva_usuarios():
                     )
                     creados += 1
                 guardar_usuarios(df_actual)
-                st.success(f"✅ {creados} usuarios creados. {omitidos} omitidos (ya existían).")
+                st.success(f"✅ {creados} asociados creados. {omitidos} omitidos (ya existían).")
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
 
 
 def seccion_carga_datos():
     st.markdown("#### Actualización mensual de saldos")
-    st.info("Sube el Excel mensual con los saldos actualizados de todos los empleados.")
+    st.info("Sube el Excel mensual con los saldos actualizados de todos los asociados.")
 
     archivo = st.file_uploader("Sube el Excel de saldos", type=["xlsx"], key="saldos")
 
@@ -195,7 +195,7 @@ def seccion_carga_datos():
             st.markdown(f"**{len(df)} registros encontrados**")
             if st.button("✅ Confirmar actualización de saldos", use_container_width=True):
                 escribir_hoja("saldos", df)
-                st.success("✅ Saldos actualizados. Los empleados ya ven sus nuevos datos.")
+                st.success("✅ Saldos actualizados. Los asociados ya ven sus nuevos datos.")
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
 
