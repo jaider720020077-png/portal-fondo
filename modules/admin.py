@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import pandas as pd
 from datetime import datetime
 from modules.auth import (
@@ -13,7 +14,7 @@ ACCESOS_PATH = "data/accesos.xlsx"
 # ── Registro de acceso ───────────────────────────────────────
 def registrar_acceso(correo, nombre, perfil):
     try:
-        if pd.io.common.file_exists(ACCESOS_PATH):
+        if os.path.exists(ACCESOS_PATH):
             df = pd.read_excel(ACCESOS_PATH)
         else:
             df = pd.DataFrame(columns=["fecha", "hora", "correo", "nombre", "perfil"])
