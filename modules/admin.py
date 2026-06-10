@@ -58,6 +58,7 @@ def seccion_usuarios():
 
 def lista_usuarios():
     df = cargar_usuarios()
+    df = df.astype(str)
     empleados = df[df["perfil"] == "empleado"].copy()
 
     if empleados.empty:
@@ -67,13 +68,13 @@ def lista_usuarios():
     st.markdown(f"**{len(empleados)} empleados registrados**")
 
     for _, fila in empleados.iterrows():
-        with st.expander(f"{'🟢' if str(fila['activo']) == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
+        with st.expander(f"{'🟢' if fila['activo'] == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.write(f"**Cédula:** {fila['cedula']}")
-                st.write(f"**Estado:** {'Activo' if str(fila['activo']) == '1' else 'Inactivo'}")
+                st.write(f"**Estado:** {'Activo' if fila['activo'] == '1' else 'Inactivo'}")
             with col2:
-                if str(fila["activo"]) == "1":
+                if fila["activo"] == "1":
                     if st.button("🔴 Desactivar", key=f"desact_{fila['correo']}"):
                         df.loc[df["correo"] == fila["correo"], "activo"] = "0"
                         guardar_usuarios(df)
@@ -87,12 +88,11 @@ def lista_usuarios():
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
-                    df = df.astype(str)
                     df.loc[df["correo"] == fila["correo"], "clave_hash"] = "temporal123"
                     df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = "1"
                     guardar_usuarios(df)
                     st.toast("Clave reseteada a: temporal123", icon="🔑")
-            st.rerun()
+                    st.rerun()
 
 
 def crear_usuario_individual():
