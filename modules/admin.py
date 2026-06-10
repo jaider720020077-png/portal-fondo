@@ -85,20 +85,20 @@ def lista_usuarios():
                     if st.button("🔴 Desactivar", key=f"desact_{fila['correo']}"):
                         df.loc[df["correo"] == fila["correo"], "activo"] = 0
                         guardar_usuarios(df)
-                        st.success("Usuario desactivado.")
+                        st.toast("✅ Usuario desactivado.", icon="🔴")
                         st.rerun()
                 else:
                     if st.button("🟢 Activar", key=f"act_{fila['correo']}"):
                         df.loc[df["correo"] == fila["correo"], "activo"] = 1
                         guardar_usuarios(df)
-                        st.success("Usuario activado.")
+                        st.toast("✅ Usuario activado.", icon="🟢")
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
                     df.loc[df["correo"] == fila["correo"], "clave_hash"] = "temporal123"
                     df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = 1
                     guardar_usuarios(df)
-                    st.success("Clave reseteada a: **temporal123**")
+                    st.toast("✅ Clave reseteada a: temporal123", icon="🔑")
                     st.rerun()
 
 
