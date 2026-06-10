@@ -42,7 +42,7 @@ def login_admin(usuario, clave):
         return True, fila.to_dict()
     return False, None
 
-def login_empleado(correo, clave):
+def login_asociado(correo, clave):
     df = cargar_usuarios()
     if df.empty:
         return False, None, False
@@ -50,7 +50,7 @@ def login_empleado(correo, clave):
     if fila.empty:
         return False, None, False
     fila = fila.iloc[0]
-    if str(fila["perfil"]) != "empleado" or str(fila["activo"]) != "1":
+    if str(fila["perfil"]) != "asociado" or str(fila["activo"]) != "1":
         return False, None, False
     if verificar_clave(clave, str(fila["clave_hash"])):
         if not str(fila["clave_hash"]).startswith("$2b$"):
