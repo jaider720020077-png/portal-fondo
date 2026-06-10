@@ -57,8 +57,7 @@ def seccion_usuarios():
 
 
 def lista_usuarios():
-    df = cargar_usuarios()
-    df = df.astype(str)
+    df = cargar_usuarios().astype(str).copy()
     empleados = df[df["perfil"] == "empleado"].copy()
 
     if empleados.empty:
@@ -76,21 +75,24 @@ def lista_usuarios():
             with col2:
                 if fila["activo"] == "1":
                     if st.button("🔴 Desactivar", key=f"desact_{fila['correo']}"):
-                        df.loc[df["correo"] == fila["correo"], "activo"] = "0"
-                        guardar_usuarios(df)
+                        df2 = cargar_usuarios().astype(str).copy()
+                        df2.loc[df2["correo"] == fila["correo"], "activo"] = "0"
+                        guardar_usuarios(df2)
                         st.toast("Usuario desactivado.", icon="🔴")
                         st.rerun()
                 else:
                     if st.button("🟢 Activar", key=f"act_{fila['correo']}"):
-                        df.loc[df["correo"] == fila["correo"], "activo"] = "1"
-                        guardar_usuarios(df)
+                        df2 = cargar_usuarios().astype(str).copy()
+                        df2.loc[df2["correo"] == fila["correo"], "activo"] = "1"
+                        guardar_usuarios(df2)
                         st.toast("Usuario activado.", icon="🟢")
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
-                    df.loc[df["correo"] == fila["correo"], "clave_hash"] = "temporal123"
-                    df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = "1"
-                    guardar_usuarios(df)
+                    df2 = cargar_usuarios().astype(str).copy()
+                    df2.loc[df2["correo"] == fila["correo"], "clave_hash"] = "temporal123"
+                    df2.loc[df2["correo"] == fila["correo"], "cambiar_clave"] = "1"
+                    guardar_usuarios(df2)
                     st.toast("Clave reseteada a: temporal123", icon="🔑")
                     st.rerun()
 
