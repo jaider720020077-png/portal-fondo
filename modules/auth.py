@@ -1,14 +1,11 @@
 import streamlit as st
 import bcrypt
 import pandas as pd
-from modules.database import leer_hoja, escribir_hoja
+from modules.database import leer_hoja, escribir_hoja, actualizar_celda
 from config import *
 
 def cargar_usuarios():
-    df = leer_hoja("usuarios")
-    if not df.empty and "cedula" in df.columns:
-        df["cedula"] = df["cedula"].astype(str)
-    return df
+    return leer_hoja("usuarios")
 
 def guardar_usuarios(df):
     escribir_hoja("usuarios", df)
@@ -30,6 +27,8 @@ def verificar_clave(clave_texto, clave_hash):
 
 def login_admin(usuario, clave):
     df = cargar_usuarios()
+    if df.empty:
+        return False, None
     fila = df[df["correo"] == usuario]
     if fila.empty:
         return False, None
@@ -38,13 +37,15 @@ def login_admin(usuario, clave):
         return False, None
     if verificar_clave(clave, str(fila["clave_hash"])):
         if not str(fila["clave_hash"]).startswith("$2b$"):
-            df.loc[df["correo"] == usuario, "clave_hash"] = hashear_clave(clave)
-            guardar_usuarios(df)
+            nuevo_hash = hashear_clave(clave)
+            actualizar_celda("usuarios", "correo", usuario, "clave_hash", nuevo_hash)
         return True, fila.to_dict()
     return False, None
 
 def login_empleado(correo, clave):
     df = cargar_usuarios()
+    if df.empty:
+        return False, None, False
     fila = df[df["correo"] == correo]
     if fila.empty:
         return False, None, False
@@ -53,15 +54,13 @@ def login_empleado(correo, clave):
         return False, None, False
     if verificar_clave(clave, str(fila["clave_hash"])):
         if not str(fila["clave_hash"]).startswith("$2b$"):
-            df.loc[df["correo"] == correo, "clave_hash"] = hashear_clave(clave)
-            guardar_usuarios(df)
+            nuevo_hash = hashear_clave(clave)
+            actualizar_celda("usuarios", "correo", correo, "clave_hash", nuevo_hash)
         debe_cambiar = str(fila["cambiar_clave"]) == "1"
         return True, fila.to_dict(), debe_cambiar
     return False, None, False
 
 def cambiar_clave(correo, clave_nueva):
-    df = cargar_usuarios()
-    df = df.astype(str)
-    df.loc[df["correo"] == correo, "clave_hash"] = hashear_clave(clave_nueva)
-    df.loc[df["correo"] == correo, "cambiar_clave"] = "0"
-    guardar_usuarios(df)
+    nuevo_hash = hashear_clave(clave_nueva)
+    actualizar_celda("usuarios", "correo", correo, "clave_hash", nuevo_hash)
+    actualizar_celda("usuarios", "correo", correo, "cambiar_clave", "0")
