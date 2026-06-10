@@ -90,13 +90,15 @@ st.markdown(f"""
     .stRadio > div {{
         gap: 1rem;
     }}
-    .stRadio label {{
+    .stRadio p {{
         color: {COLOR_TEXTO} !important;
         font-weight: 500;
     }}
-    .stRadio > label {{
+    div[data-testid="stRadio"] p {{
         color: {COLOR_TEXTO} !important;
-        font-weight: 600;
+    }}
+    div[data-testid="stRadio"] label span {{
+        color: {COLOR_TEXTO} !important;
     }}
 
     /* Métricas del dashboard */
