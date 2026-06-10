@@ -312,10 +312,10 @@ elif st.session_state.perfil == "admin":
     panel_admin()
 
 elif st.session_state.perfil == "empleado":
+    from modules.empleado import dashboard_empleado
     col1, col2 = st.columns([8, 1])
     with col2:
         if st.button("🚪 Salir"):
             st.session_state.clear()
             st.rerun()
-    st.title(f"👤 {st.session_state.usuario['nombre']}")
-    st.info("Dashboard en construcción.")
+    dashboard_empleado()
