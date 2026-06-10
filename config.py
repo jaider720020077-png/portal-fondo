@@ -8,19 +8,19 @@ NOMBRE_CORTO = "FEDEPROM"
 LOGO = "assets/logo.png"
 
 # ── Colores ──────────────────────────────────────────────────
-COLOR_PRIMARIO   = "#2C3E7A"   # Azul marino
-COLOR_SECUNDARIO = "#4A90D9"   # Azul medio
-COLOR_ACENTO     = "#27AE60"   # Verde
-COLOR_FONDO      = "#F8F9FA"   # Gris muy claro
-COLOR_TEXTO      = "#2C3E50"   # Gris oscuro
+COLOR_PRIMARIO   = "#C8102E"   # Rojo PROMEDICO
+COLOR_SECUNDARIO = "#A50D25"   # Rojo oscuro
+COLOR_ACENTO     = "#059669"   # Verde
+COLOR_FONDO      = "#F7F7F7"   # Gris muy claro
+COLOR_TEXTO      = "#1A1A1A"   # Negro suave
 
 # ── Textos ───────────────────────────────────────────────────
 MENSAJE_BIENVENIDA = "Consulta tu estado de cuenta en línea"
 MENSAJE_LOGIN      = "Ingresa con tu correo y contraseña"
 
 # ── Seguridad ─────────────────────────────────────────────────
-DIAS_CLAVE_TEMPORAL  = 7
+DIAS_CLAVE_TEMPORAL   = 7
 LONGITUD_MINIMA_CLAVE = 8
 
 # ── Soporte ──────────────────────────────────────────────────
-CORREO_SOPORTE = "soporte@promedico.com"
+CORREO_SOPORTE = "promedico@promedico.com.co"
