@@ -1,29 +1,21 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
 from modules.auth import cargar_usuarios, guardar_usuarios, hashear_clave
+from modules.database import leer_hoja, escribir_hoja, agregar_fila
 from config import *
-
-SALDOS_PATH = "data/saldos.xlsx"
-ACCESOS_PATH = "data/accesos.xlsx"
 
 
 def registrar_acceso(correo, nombre, perfil):
     try:
-        if os.path.exists(ACCESOS_PATH):
-            df = pd.read_excel(ACCESOS_PATH)
-        else:
-            df = pd.DataFrame(columns=["fecha", "hora", "correo", "nombre", "perfil"])
-        nueva_fila = {
+        fila = {
             "fecha": datetime.now().strftime("%Y-%m-%d"),
             "hora": datetime.now().strftime("%H:%M:%S"),
             "correo": correo,
             "nombre": nombre,
             "perfil": perfil
         }
-        df = pd.concat([df, pd.DataFrame([nueva_fila])], ignore_index=True)
-        df.to_excel(ACCESOS_PATH, index=False)
+        agregar_fila("accesos", fila)
     except Exception:
         pass
 
@@ -75,30 +67,30 @@ def lista_usuarios():
     st.markdown(f"**{len(empleados)} empleados registrados**")
 
     for _, fila in empleados.iterrows():
-        with st.expander(f"{'🟢' if fila['activo'] == 1 else '🔴'} {fila['nombre']} — {fila['correo']}"):
+        with st.expander(f"{'🟢' if str(fila['activo']) == '1' else '🔴'} {fila['nombre']} — {fila['correo']}"):
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.write(f"**Cédula:** {fila['cedula']}")
-                st.write(f"**Estado:** {'Activo' if fila['activo'] == 1 else 'Inactivo'}")
+                st.write(f"**Estado:** {'Activo' if str(fila['activo']) == '1' else 'Inactivo'}")
             with col2:
-                if fila["activo"] == 1:
+                if str(fila["activo"]) == "1":
                     if st.button("🔴 Desactivar", key=f"desact_{fila['correo']}"):
-                        df.loc[df["correo"] == fila["correo"], "activo"] = 0
+                        df.loc[df["correo"] == fila["correo"], "activo"] = "0"
                         guardar_usuarios(df)
-                        st.toast("✅ Usuario desactivado.", icon="🔴")
+                        st.toast("Usuario desactivado.", icon="🔴")
                         st.rerun()
                 else:
                     if st.button("🟢 Activar", key=f"act_{fila['correo']}"):
-                        df.loc[df["correo"] == fila["correo"], "activo"] = 1
+                        df.loc[df["correo"] == fila["correo"], "activo"] = "1"
                         guardar_usuarios(df)
-                        st.toast("✅ Usuario activado.", icon="🟢")
+                        st.toast("Usuario activado.", icon="🟢")
                         st.rerun()
             with col3:
                 if st.button("🔑 Resetear clave", key=f"reset_{fila['correo']}"):
                     df.loc[df["correo"] == fila["correo"], "clave_hash"] = "temporal123"
-                    df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = 1
+                    df.loc[df["correo"] == fila["correo"], "cambiar_clave"] = "1"
                     guardar_usuarios(df)
-                    st.toast("✅ Clave reseteada a: temporal123", icon="🔑")
+                    st.toast("Clave reseteada a: temporal123", icon="🔑")
                     st.rerun()
 
 
@@ -135,8 +127,8 @@ def crear_usuario_individual():
             "correo": correo,
             "clave_hash": clave_temp,
             "perfil": "empleado",
-            "activo": 1,
-            "cambiar_clave": 1
+            "activo": "1",
+            "cambiar_clave": "1"
         }
         df = pd.concat([df, pd.DataFrame([nueva_fila])], ignore_index=True)
         guardar_usuarios(df)
@@ -174,8 +166,8 @@ def carga_masiva_usuarios():
                         "correo": fila["correo"],
                         "clave_hash": "temporal123",
                         "perfil": "empleado",
-                        "activo": 1,
-                        "cambiar_clave": 1
+                        "activo": "1",
+                        "cambiar_clave": "1"
                     }
                     df_actual = pd.concat(
                         [df_actual, pd.DataFrame([nueva_fila])],
@@ -200,7 +192,7 @@ def seccion_carga_datos():
             st.dataframe(df.head(10), use_container_width=True)
             st.markdown(f"**{len(df)} registros encontrados**")
             if st.button("✅ Confirmar actualización de saldos", use_container_width=True):
-                df.to_excel(SALDOS_PATH, index=False)
+                escribir_hoja("saldos", df)
                 st.success("✅ Saldos actualizados. Los empleados ya ven sus nuevos datos.")
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
@@ -209,15 +201,12 @@ def seccion_carga_datos():
 def seccion_accesos():
     st.markdown("#### Registro de accesos")
     try:
-        if os.path.exists(ACCESOS_PATH):
-            df = pd.read_excel(ACCESOS_PATH)
-            if df.empty:
-                st.info("Aún no hay registros de acceso.")
-                return
-            df = df.sort_values("fecha", ascending=False)
-            st.dataframe(df, use_container_width=True)
-        else:
+        df = leer_hoja("accesos")
+        if df.empty:
             st.info("Aún no hay registros de acceso.")
+            return
+        df = df.sort_values("fecha", ascending=False)
+        st.dataframe(df, use_container_width=True)
     except Exception:
         st.info("Aún no hay registros de acceso.")
 
