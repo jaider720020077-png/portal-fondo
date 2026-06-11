@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from modules.auth import cargar_usuarios, guardar_usuarios, hashear_clave
-from modules.database import leer_hoja, escribir_hoja, agregar_fila
+from modules.database import leer_hoja, escribir_hoja, agregar_fila, actualizar_celda
 from config import *
 
 
